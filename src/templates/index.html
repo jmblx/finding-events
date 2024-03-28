@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Main Page{% endblock %}
+
+{% block content %}
+    <h1 class="my-4">Main Page</h1>
+    <div class="row">
+        {% for event in events %}
+        <div class="col-md-4">
+            <div class="card event-card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    <p class="card-text">{{ event.description }}</p>
+                    <p class="card-text"><strong>Address:</strong> {{ event.address }}</p>
+                    <p class="card-text"><strong>Category:</strong> {{ event.category_id }}</p>
+                </div>
+            </div>
+        </div>
+        {% if loop.index % 3 == 0 %}
+    </div>
+    <div class="row">
+        {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

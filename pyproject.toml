@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "finding-events"
+version = "0.1.0"
+description = ""
+authors = ["CoSm1C AvEnGeR <zhora.zhilin.06@mail.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["all"], version = "^0.110.0"}
+uvicorn = "^0.29.0"
+motor = "^3.3.2"
+beanie = "^1.25.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
