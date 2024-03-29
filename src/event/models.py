@@ -1,7 +1,7 @@
 from typing import Optional
 
 import pymongo
-from beanie import Document
+from beanie import Document, Indexed
 
 
 class Category(Document):
@@ -13,16 +13,10 @@ class Category(Document):
 
 
 class Event(Document):
-    title: str
-    description: Optional[str] = None
-    address: Optional[str] = None
+    title: Indexed(str, index_type=pymongo.TEXT, unique=True)
+    description: Optional[Indexed(str, index_type=pymongo.TEXT)] = None
+    address: Optional[Indexed(str, index_type=pymongo.TEXT)] = None
     category_id: str
 
     class Settings:
         name = "event"
-        indexes = [
-            [
-                ("title", pymongo.TEXT),
-                ("description", pymongo.TEXT),
-            ]
-        ]

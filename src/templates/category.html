@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Main Page{% endblock %}
+{% block title %}Category Events{% endblock %}
 
 {% block content %}
-    <h1 class="my-4">Main Page</h1>
+    <h1 class="my-4">Events in Category {{ category_name }}</h1>
     <div class="row">
         {% for event in events %}
         <div class="col-md-4">
@@ -12,7 +12,7 @@
                     <h5 class="card-title"><a href="/pages/event/{{ event.id }}">{{ event.title }}</a></h5>
                     <p class="card-text">{{ event.description }}</p>
                     <p class="card-text"><strong>Address:</strong> {{ event.address }}</p>
-                    <p class="card-text"><strong>Category:</strong> {{ event.category_id }}</p>
+                    <p class="card-text"><strong>Category:</strong> {{ categories_dict[event.category_id] }}</p>
                 </div>
             </div>
         </div>

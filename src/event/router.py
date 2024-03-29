@@ -46,8 +46,11 @@ async def get_event(event_id: str, response: Response):
 
 
 @router.get("/")
-async def get_events():
+async def get_all_events():
     return {"data": await db.get_all(Event)}
+
+
+
 
 
 @router.put("/{event_id}")
