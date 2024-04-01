@@ -20,7 +20,8 @@ async def main_page(request: Request):
 
 @router.get("/category/{category_id}", response_class=HTMLResponse)
 async def category_events_page(request: Request, category_id: str):
-    events = await db.get(Event, criteria={"category_id": category_id})
+    events = await db.get(Event, criteria=Event.category.id == ObjectId(category_id))
+    print(events)
     categories_dict = await db.get_categories_dict()
     category_name = categories_dict.get(category_id, "Unknown Category")
     return templates.TemplateResponse(
@@ -39,3 +40,17 @@ async def event_details_page(request: Request, event_id: str):
 @router.get("/new_event", response_class=HTMLResponse)
 async def add_event_page(request: Request):
     return templates.TemplateResponse("add_event.html", {"request": request, "categories": await db.get_all(Category)})
+
+
+@router.get("/event/{event_id}/edit")
+async def get_event_form(request: Request, event_id: str):
+    event = await db.get_one(Event, Event.id == ObjectId(event_id))
+    event["category"] = dict(event["category"])
+    if not event:
+        return {"error": "Event not found"}
+    return templates.TemplateResponse(
+        "update_event.html",
+        {
+            "request": request, "event": event, "categories": await db.get_all(Category)
+        }
+    )

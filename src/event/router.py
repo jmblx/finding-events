@@ -1,5 +1,8 @@
+import json
+from typing import Optional
+
 from bson import ObjectId
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, UploadFile, File, Form
 from starlette.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
@@ -9,7 +12,7 @@ from starlette.status import (
 
 from event.db import Db
 from event.models import Event, Category
-from event.schemas import EventAdd, CategoryAdd, EventUpdate
+from event.schemas import EventAdd, CategoryAdd, EventUpdate, EventResponse, CategoryResponse
 
 router = APIRouter(prefix="/events", tags=["events"])
 
@@ -37,30 +40,32 @@ async def add_event(data: EventAdd, response: Response):
 
 @router.get("/{event_id}")
 async def get_event(event_id: str, response: Response):
-    print(event_id)
-    data = await db.get_one(Event, Event.id == ObjectId(event_id))
-    if data.get("error"):
+    event = await db.get_one(Event, Event.id == ObjectId(event_id))
+    if event.get("error"):
         response.status_code = HTTP_404_NOT_FOUND
-        return {"status": data.get("error")}
-    return data
+        return {"status": event.get("error")}
+
+    event_response = EventResponse.from_orm(event)
+    return event
 
 
 @router.get("/")
 async def get_all_events():
-    return {"data": await db.get_all(Event)}
-
-
-
+    print(await db.get_all(Event))
+    return await db.get_all(Event)
 
 
 @router.put("/{event_id}")
-async def update_event(event_id: str, data: EventUpdate, response: Response):
-    res = await db.update(Event, Event.id == ObjectId(event_id), data)
+async def update_event(event_id: str, response: Response, file: Optional[UploadFile] = File(None), data: str = Form(...)):
+    data = json.loads(data)
+    update_data = EventUpdate(**data)
+    res = await db.update(
+        model=Event, criteria=Event.id == ObjectId(event_id), update_data=update_data, img=file, obj_id=event_id)
     if type(res) == dict:
         if "error" in res.keys():
             response.status_code = HTTP_404_NOT_FOUND
             return {"status": res.get("error")}
-    return {"status": "ok"}
+    return res
 
 
 @router.delete("/{event_id}")
@@ -70,3 +75,10 @@ async def delete_event(event_id: str, response: Response):
         response.status_code = HTTP_404_NOT_FOUND
     return res
 
+
+# @router.put("/{event_id}/")
+# async def upload_team_avatar(
+#     file: Optional[UploadFile] = File(None),
+#     event_id: str,
+# ):
+#     return {"new_path": await db.set_photo(Event, event_id, file)}

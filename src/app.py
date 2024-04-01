@@ -35,6 +35,7 @@ async def shutdown_db_client():
     close_mongo_connection()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/img", StaticFiles(directory="img"), name="img")
 
 app.include_router(user_router)
 app.include_router(event_router)

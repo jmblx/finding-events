@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Update Event{% endblock %}
+
+{% block content %}
+<h2>Update Event</h2>
+<form id="updateEventForm" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" name="title" value="{{ event.title }}" required>
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-control" id="description" name="description">{{ event.description }}</textarea>
+    </div>
+    <div class="form-group">
+        <label for="address">Address</label>
+        <input type="text" class="form-control" id="address" name="address" value="{{ event.address }}">
+    </div>
+    <div class="form-group">
+        <label for="category">Category</label>
+        <select class="form-control" id="category" name="category" required>
+            {% for category in categories %}
+            <option value="{{ category.id }}" {% if category.id == event.category.id|string %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="file" style="margin-right: 40px">Event Image (optional)</label>
+                        <img src="/img/{{ event.img_path }}" class="card-img-top" alt="{{ event.title }}" style="object-fit: cover; height: 270px; width: 270px; margin: 20px 0px">
+        <input type="file" class="form-control-file" id="file" name="file">
+    </div>
+    <button type="button" class="btn btn-primary" onclick="submitForm()">Update Event</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+async function submitForm() {
+    const form = document.getElementById('updateEventForm');
+    const formData = new FormData(form);
+
+    // Удаление файла из объекта formData и подготовка его к отдельной отправке
+    const file = formData.get('file');
+    formData.delete('file'); // Удаляем файл, чтобы не отправлять его вместе с остальными данными формы
+
+    // Преобразование оставшихся данных формы в JSON строку
+    const jsonFormData = JSON.stringify(Object.fromEntries(formData.entries()));
+
+    // Создание нового объекта FormData для отправки данных и файла
+    const submitData = new FormData();
+    submitData.append('data', jsonFormData);
+    if (file && file.size > 0) {
+        submitData.append('file', file);
+    }
+
+    const response = await fetch('/events/{{ event.id }}', {
+        method: 'PUT',
+        body: submitData  // Отправляем как multipart/form-data
+    });
+
+    if (response.ok) {
+        console.log('Event updated successfully');
+        // Опционально: перенаправление или обновление страницы
+    } else {
+        console.error('Failed to update event');
+        // Опционально: обработка ошибок
+    }
+}
+</script>
+{% endblock %}

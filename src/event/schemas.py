@@ -1,6 +1,9 @@
-from typing import Optional
+from typing import Optional, List
 
-from pydantic import BaseModel
+from bson import ObjectId
+from pydantic import BaseModel, Field, validator, field_validator
+
+from event.models import Event
 
 
 class CategoryAdd(BaseModel):
@@ -20,16 +23,46 @@ class CategoryGet(CategoryAdd):
 class EventAdd(BaseModel):
     title: str
     description: str
+    img_path: Optional[str] = None
     address: str
-    category_id: str
+    category: str
 
 
-class EventUpdate(EventAdd):
+class EventUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     address: Optional[str] = None
-    category_id: Optional[str] = None
+    category: Optional[str] = None
 
 
-class EventGet(EventAdd):
-    _id: str
+class CategoryResponse(BaseModel):
+    id: str = Field(..., description="The unique identifier for the category")
+    name: str
+    description: str
+
+    @field_validator('id', mode="before")
+    def id_to_string(cls, value):
+        if isinstance(value, ObjectId):
+            return str(value)
+        return value
+
+    class Config:
+        from_attributes = True
+
+
+class EventResponse(BaseModel):
+    id: str = Field(..., description="The unique identifier for the event")
+    title: str
+    description: Optional[str] = None
+    img_path: Optional[str] = None
+    address: Optional[str] = None
+    category: CategoryResponse
+
+    @field_validator('id', mode="before")
+    def id_to_string(cls, value):
+        if isinstance(value, ObjectId):
+            return str(value)
+        return value
+
+    class Config:
+        from_attributes = True
