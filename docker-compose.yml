@@ -6,12 +6,17 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: rootuser
       MONGO_INITDB_ROOT_PASSWORD: rootpass
+    container_name: db
     ports:
       - "27017:27017"
     volumes:
       - db-data:/data/db
+    networks:
+      - custom
   fastapi_app:
-    image: menoitami/basketball-mm
+    build:
+      context: .
+    container_name: fastapi_app
     command: [ "/fastapi_app/docker/app.sh" ]
     ports:
       - "8000:8000"
