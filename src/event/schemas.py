@@ -35,6 +35,10 @@ class EventUpdate(BaseModel):
     category: Optional[str] = None
 
 
+class EventGet(EventUpdate):
+    id: Optional[str] = None
+
+
 class CategoryResponse(BaseModel):
     id: str = Field(..., description="The unique identifier for the category")
     name: str

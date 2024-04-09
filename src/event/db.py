@@ -33,20 +33,6 @@ class Db:
         await model.insert_one(obj)
         return {"id": str(obj.id)}
 
-    async def set_photo(self, model: Document, id: str, file):
-        obj = await self.get_one(model, model.id == ObjectId(id))
-        model_name = model.get_settings().name
-        directory_path = os.path.join("images", model_name)
-        os.makedirs(directory_path, exist_ok=True)
-        save_path = os.path.join(directory_path, f"{obj.get('id')}")
-        with open(save_path, "wb") as new_file:
-            shutil.copyfileobj(file.file, new_file)
-        with Image.open(save_path) as img:
-            img = img.resize((350, 350))
-            new_save_path = os.path.splitext(save_path)[0] + ".webp"
-            img.save(new_save_path, "WEBP")
-        await self.update(Event, Event.id == ObjectId(obj.get('id')), {"img_path": new_save_path})
-        return new_save_path
 
     async def get_one(self, model, criteria) -> dict:
         obj = await model.find_one(criteria, fetch_links=True, nesting_depth=1)
@@ -107,7 +93,6 @@ class Db:
             obj = await self.get_one(model, model.id == ObjectId(obj_id))
             model_name = model.get_settings().name
             directory_path = os.path.join("images", model_name)
-            os.makedirs(directory_path, exist_ok=True)
             save_path = os.path.join(directory_path, f"{obj.get('id')}")
             with open(save_path, "wb") as new_file:
                 shutil.copyfileobj(img.file, new_file)
@@ -115,7 +100,7 @@ class Db:
                 img = img.resize((350, 350))
                 new_save_path = os.path.splitext(save_path)[0] + ".webp"
                 img.save(new_save_path, "WEBP")
-            update_dict["img_path"] = new_save_path
+            update_dict["img_path"] = os.path.relpath(new_save_path, start="images")
 
         update_result = await model.find(criteria).update({"$set": update_dict})
 

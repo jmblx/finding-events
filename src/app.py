@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from strawberry.fastapi import GraphQLRouter
 
 from database import connect_to_mongo, close_mongo_connection
-from event.router import router as event_router
+from event.router import router as event_router, schema
 from pages.router import router as pages_router
 from user.router import router as user_router
 
@@ -25,6 +26,7 @@ app.add_middleware(
     ],
 )
 
+
 @app.on_event("startup")
 async def startup_db_client():
     await connect_to_mongo()
@@ -35,8 +37,10 @@ async def shutdown_db_client():
     close_mongo_connection()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/img", StaticFiles(directory="img"), name="img")
+app.mount("/img", StaticFiles(directory="images"), name="images")
 
+graphql_app = GraphQLRouter(schema)
+app.include_router(graphql_app, prefix="/graphql")
 app.include_router(user_router)
 app.include_router(event_router)
 app.include_router(pages_router)

@@ -3,6 +3,7 @@ import os
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
+from config import mongo_url
 from event.models import Category, Event
 from user.models import User
 
@@ -22,7 +23,7 @@ def get_database() -> AsyncIOMotorClient:
 
 
 async def connect_to_mongo():
-    db.client = AsyncIOMotorClient(F'mongodb://{os.getenv("MONGO_HOSTNAME", "localhost")}:27017')
+    db.client = AsyncIOMotorClient(mongo_url)
     await init_beanie(database=db.client.db_name, document_models=[Category, User, Event])
 
 
