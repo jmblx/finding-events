@@ -22,8 +22,8 @@ def get_database() -> AsyncIOMotorClient:
 
 
 async def connect_to_mongo():
-    db.client = AsyncIOMotorClient(F'mongodb://{os.getenv("MONGO_HOSTNAME", "localhost")}:27017')
-    await init_beanie(database=db.client.db_name, document_models=[Category, User, Event])
+    db.client = AsyncIOMotorClient(f'mongodb://{os.getenv("MONGO_HOSTNAME", "localhost")}:27017/{os.getenv("MONGO_DB")}')
+    await init_beanie(database=os.getenv("MONGO_DB"), document_models=[Category, User, Event])
 
 
 def close_mongo_connection():
