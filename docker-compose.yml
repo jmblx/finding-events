@@ -15,7 +15,8 @@ services:
     container_name: fastapi_app
     command: [ "/fastapi_app/docker/app.sh" ]
     ports:
-      - "8000:8000"
+      - "80:8000"
+      - "443:443"
     expose:
       - 8000
     networks:
