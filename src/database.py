@@ -9,6 +9,7 @@ from user.models import User
 
 class DataBase:
     client: AsyncIOMotorClient = None
+    client.db_name = os.getenv("MONGO_DB", "database_name")
 
     def get_db_client(self) -> AsyncIOMotorClient:
         return self.client
