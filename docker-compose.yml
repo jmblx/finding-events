@@ -20,8 +20,6 @@ services:
     command: [ "/fastapi_app/docker/app.sh" ]
     ports:
       - "8000:8000"
-    expose:
-      - 8000
     networks:
       - custom
     depends_on:
