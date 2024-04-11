@@ -16,7 +16,6 @@ services:
     command: [ "/fastapi_app/docker/app.sh" ]
     ports:
       - "8000:8000"
-      - "443:443"
     expose:
       - 8000
     networks:
