@@ -1,11 +1,7 @@
-version: "3.7"
 services:
   db:
     image: mongo
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: rootuser
-      MONGO_INITDB_ROOT_PASSWORD: rootpass
     container_name: db
     ports:
       - "27017:27017"
@@ -25,11 +21,21 @@ services:
     depends_on:
       - db
     environment:
-      MONGO_USERNAME: rootuser
-      MONGO_PASSWORD: rootpass
       MONGO_HOSTNAME: db
       MONGO_PORT: 27017
-      MONGO_DB: your_db_name
+      MONGO_DB: events
+web:
+    container_name: "web"
+    image: nginx:alpine
+    depends_on:
+      - fastapi_app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./app/conf.d:/etc/nginx/conf.d
+    networks:
+      - custom
 networks:
   custom:
     driver: bridge
